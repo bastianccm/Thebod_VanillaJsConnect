@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config>
+    <global>
+        <helpers>
+            <vanillajsconnect>
+                <class>Thebod_VanillaJsConnect_Helper</class>
+            </vanillajsconnect>
+        </helpers>
+    </global>
+
+    <frontend>
+        <routers>
+            <vanillajsconnect>
+                <use>standard</use>
+                <args>
+                    <module>Thebod_VanillaJsConnect</module>
+                    <frontName>vanillajsconnect</frontName>
+                </args>
+            </vanillajsconnect>
+        </routers>
+    </frontend>
+</config>
