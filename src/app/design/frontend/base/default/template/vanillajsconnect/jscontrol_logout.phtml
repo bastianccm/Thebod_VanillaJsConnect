@@ -1,5 +1,6 @@
 $(document).ready(function() {
-    if ($('.SignOut').length) {
+    signedIn = $('#SignedIn').val();
+    if (signedIn != 0) {
         transientKey = $('#TransientKey').val();
         document.location = gdn.url('/entry/signout?TransientKey=' + transientKey);
     }
