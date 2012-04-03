@@ -1,5 +1,6 @@
 $(document).ready(function() {
     if ($('.SignOut').length) {
-        document.location = $('.SignOut').children('a').attr('href');
+        transientKey = $('#TransientKey').val();
+        document.location = gdn.url('/entry/signout?TransientKey=' + transientKey);
     }
 });
