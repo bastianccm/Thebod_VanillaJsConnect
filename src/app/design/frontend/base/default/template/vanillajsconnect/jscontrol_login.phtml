@@ -1,0 +1,5 @@
+$(document).ready(function() {
+    if ($('.JsConnect-Guest').length) {
+        window.location = gdn.url('/entry/jsconnect?client_id=<?php echo $this->getClientId() ?>&Target=/');
+    }
+});

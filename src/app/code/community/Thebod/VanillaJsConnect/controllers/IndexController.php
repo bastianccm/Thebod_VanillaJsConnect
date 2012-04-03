@@ -16,6 +16,11 @@ class Thebod_VanillaJsConnect_IndexController extends Mage_Core_Controller_Front
         $clientId = Mage::getStoreConfig('customer/vanillajsconnect/client_id');
         $clientSecret = Mage::getStoreConfig('customer/vanillajsconnect/client_secret');
 
+        /**
+         * @var Thebod_VanillaJsConnect_Model_Jsconnect $model
+         */
+        $model = Mage::getModel('vanillajsconnect/jsconnect');
+
         $result = array();
 
         // checking input parameters
@@ -58,7 +63,7 @@ class Thebod_VanillaJsConnect_IndexController extends Mage_Core_Controller_Front
                 'error' => 'invalid_request',
                 'message' => 'The timestamp is invalid.'
             );
-        } else if (($this->_signature($this->getRequest()->getParam('timestamp') . $clientSecret) != $this->getRequest()->getParam('signature')) && 0) {
+        } else if (($model->signature($this->getRequest()->getParam('timestamp') . $clientSecret) != $this->getRequest()->getParam('signature')) && 0) {
             // wrong signature
             $result = array(
                 'error' => 'access_denied',
@@ -67,9 +72,9 @@ class Thebod_VanillaJsConnect_IndexController extends Mage_Core_Controller_Front
         }
 
         if(!isset($result['error'])) {
-            $user = $this->_buildUserArray();
+            $user = $model->buildUserArray();
             if(count($user)) {
-                $result = $this->_buildSignedResult($user, $clientId, $clientSecret);
+                $result = $model->buildSignedResult($user, $clientId, $clientSecret);
             } else {
                 $result = array('name' => '', 'photourl' => '');
             }
@@ -85,61 +90,11 @@ class Thebod_VanillaJsConnect_IndexController extends Mage_Core_Controller_Front
         $this->getResponse()->setBody($result);
     }
 
-    /**
-     * return signature
-     *
-     * @param string $string
-     * @return string
-     */
-    protected function _signature($string) {
-        return md5($string);
-    }
-
-    /**
-     * returns $data with signature and client_id
-     *
-     * @param array $data
-     * @param string $clientId
-     * @param string $clientSecret
-     * @return array
-     */
-    protected function _buildSignedResult($data, $clientId, $clientSecret) {
-        ksort($data);
-
-        foreach ($data as $k => $v) {
-            if(is_null($v)) {
-                $data[$k] = '';
-            }
-        }
-
-        $string = http_build_query($data, null, '&');
-        $signature = $this->_signature($string . $clientSecret);
-
-        $data['client_id'] = $clientId;
-        $data['signature'] = $signature;
-
-        return $data;
-    }
-
-    /**
-     * builds user array
-     *
-     * @todo return false/null when not logged in instead of an empty array
-     * @return array
-     */
-    protected function _buildUserArray() {
-        if(!Mage::getSingleton('customer/session')->isLoggedIn()) {
-            return array();
-        }
-
-        $customer = Mage::getSingleton('customer/session')->getCustomer();
-        $data = array(
-            'uniqueid'  => $customer->getId(),
-            'name'      => $customer->getName(),
-            'email'     => $customer->getEmail(),
-            'photourl'  => '',
+    public function jscontrolAction() {
+        $this->getResponse()->setBody(
+            $this->getLayout()->createBlock('vanillajsconnect/jscontrol')
+                ->setClientId(Mage::getStoreConfig('customer/vanillajsconnect/client_id'))
+                ->toHtml()
         );
-
-        return $data;
     }
 }
